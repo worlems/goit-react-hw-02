@@ -3,6 +3,7 @@ import Notification from "./components/notification/Notification";
 import Feedback from "./components/feedback/Feedback";
 import Options from "./components/options/Options";
 import React, { useState, useEffect } from "react";
+import Description from "./components/Description/Description";
 
 const LOCAL_STORAGE_KEY = "feedbackData";
 
@@ -32,12 +33,7 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Sip Happens Café</h1>
-      <p className="description">
-        Please leave your feedback about our service by selecting one of the
-        options below.
-      </p>
-
+      <Description />
       <Options
         onLeaveFeedback={updateFeedback}
         onReset={resetFeedback}
