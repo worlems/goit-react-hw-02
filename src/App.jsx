@@ -1,35 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import Notification from "./components/notification/Notification";
+import Feedback from "./components/feedback/Feedback";
+import Options from "./components/options/Options";
+import React, { useState, useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const LOCAL_STORAGE_KEY = "feedbackData";
+
+const App = () => {
+  const [feedback, setFeedback] = useState(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : { good: 0, neutral: 0, bad: 0 };
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(feedback));
+  }, [feedback]);
+
+  const updateFeedback = (type) => {
+    setFeedback((prev) => ({ ...prev, [type]: prev[type] + 1 }));
+  };
+
+  const resetFeedback = () => {
+    setFeedback({ good: 0, neutral: 0, bad: 0 });
+  };
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+  const positivePercentage =
+    totalFeedback > 0
+      ? Math.round(((feedback.good + feedback.neutral) / totalFeedback) * 100)
+      : 0;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <div className="container">
+      <h1 className="title">Sip Happens Café</h1>
+      <p className="description">
+        Please leave your feedback about our service by selecting one of the
+        options below.
       </p>
-    </>
-  )
-}
 
-export default App
+      <Options
+        onLeaveFeedback={updateFeedback}
+        onReset={resetFeedback}
+        hasFeedback={totalFeedback > 0}
+      />
+
+      {totalFeedback > 0 ? (
+        <Feedback
+          good={feedback.good}
+          neutral={feedback.neutral}
+          bad={feedback.bad}
+          total={totalFeedback}
+          positivePercentage={positivePercentage}
+        />
+      ) : (
+        <Notification message="No feedback yet" />
+      )}
+    </div>
+  );
+};
+export default App;
